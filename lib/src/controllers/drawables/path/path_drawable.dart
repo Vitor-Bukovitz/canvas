@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_painter/flutter_painter_extensions.dart';
+import 'package:flutter_painter/src/controllers/drawables/path/smooth_style_drawable.dart';
 
 import '../drawable.dart';
 
@@ -53,5 +55,20 @@ abstract class PathDrawable extends Drawable {
 
     // Draw the path on the canvas
     canvas.drawPath(path, paint);
+
+    final currentDrawable = this;
+    for (int i = 1; i < this.path.length; i++) {
+      canvas.drawPath(
+        Path()
+          ..moveTo(this.path[i - 1].dx, this.path[i - 1].dy)
+          ..lineTo(this.path[i].dx, this.path[i].dy),
+        paint.copyWith(
+          strokeWidth: currentDrawable is SmoothStyleDrawable
+              ? currentDrawable.strokeWidthList[i]
+              : strokeWidth,
+          blendMode: BlendMode.src,
+        ),
+      );
+    }
   }
 }

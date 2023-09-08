@@ -39,6 +39,8 @@ enum FreeStyleMode {
   /// Free-style painting is enabled in drawing mode; used to draw scribbles.
   draw,
 
+  drawSmooth,
+
   /// Free-style painting is enabled in erasing mode; used to erase drawings.
   erase,
 }
