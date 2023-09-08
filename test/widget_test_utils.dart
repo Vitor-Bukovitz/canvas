@@ -5,7 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 /// Simple wrapper for testing specific widget
 /// so that we don't need to write things multiple times
 class WidgetTestbed {
-
   /// In case that we want to specify platform  for running tests
   Future<void> withPlatform(
     final TargetPlatform platform,
