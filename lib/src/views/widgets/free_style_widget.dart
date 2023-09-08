@@ -35,6 +35,7 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
             onHorizontalDragDown: _handleHorizontalDragDown,
             onHorizontalDragUpdate: _handleHorizontalDragUpdate,
             onHorizontalDragUp: _handleHorizontalDragUp,
+            onScaling: _handleScaling,
           ),
           (_) {},
         ),
@@ -110,6 +111,10 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
     drawable = null;
   }
 
+  void _handleScaling() {
+    PainterController.of(context).undo();
+  }
+
   Offset _globalToLocal(Offset globalPosition) {
     final getBox = context.findRenderObject() as RenderBox;
 
@@ -123,13 +128,16 @@ class _DragGestureDetector extends OneSequenceGestureRecognizer {
     required this.onHorizontalDragDown,
     required this.onHorizontalDragUpdate,
     required this.onHorizontalDragUp,
+    required this.onScaling,
   });
 
   final ValueSetter<Offset> onHorizontalDragDown;
   final ValueSetter<Offset> onHorizontalDragUpdate;
   final VoidCallback onHorizontalDragUp;
+  final VoidCallback onScaling;
 
   bool _isTrackingGesture = false;
+  bool _isZooming = false;
 
   @override
   void addPointer(PointerEvent event) {
@@ -137,13 +145,23 @@ class _DragGestureDetector extends OneSequenceGestureRecognizer {
       resolve(GestureDisposition.accepted);
       startTrackingPointer(event.pointer);
       _isTrackingGesture = true;
+      _isZooming = false;
     } else {
+      onScaling();
       stopTrackingPointer(event.pointer);
+      _isZooming = true;
+      _isTrackingGesture = false;
     }
   }
 
   @override
   void handleEvent(PointerEvent event) {
+    if (_isZooming) {
+      onHorizontalDragUp();
+      stopTrackingPointer(event.pointer);
+      _isTrackingGesture = false;
+      return;
+    }
     if (event is PointerDownEvent) {
       onHorizontalDragDown(event.position);
     } else if (event is PointerMoveEvent) {
@@ -152,6 +170,7 @@ class _DragGestureDetector extends OneSequenceGestureRecognizer {
       onHorizontalDragUp();
       stopTrackingPointer(event.pointer);
       _isTrackingGesture = false;
+      _isZooming = false;
     }
   }
 
