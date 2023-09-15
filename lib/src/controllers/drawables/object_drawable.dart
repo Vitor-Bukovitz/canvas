@@ -19,11 +19,6 @@ abstract class ObjectDrawable extends Drawable {
   /// The smallest value for the scale of an object drawable.
   static const double minScale = 0.001;
 
-  @Deprecated(
-      "min_scale is deprecated to conform with flutter_lints, use minScale instead")
-  // ignore: non_constant_identifier_names
-  double get min_scale => minScale;
-
   /// The location of the object to be painted.
   final Offset position;
 

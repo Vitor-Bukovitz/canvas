@@ -124,8 +124,11 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  void insertDrawables(int index, Iterable<Drawable> drawables,
-      {bool newAction = true}) {
+  void insertDrawables(
+    int index,
+    Iterable<Drawable> drawables, {
+    bool newAction = true,
+  }) {
     final action = InsertDrawablesAction(index, drawables.toList());
     action.perform(this);
     _addAction(action, newAction);

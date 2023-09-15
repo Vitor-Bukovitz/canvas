@@ -65,7 +65,7 @@ class DoubleArrowDrawable extends Sized1DDrawable implements ShapeDrawable {
 
     if ((end - start).dx > 0) canvas.drawLine(start, end, paint);
 
-    final pathDx = dx /*.clamp(-arrowHeadSize/2, double.infinity)*/;
+    final pathDx = dx;
 
     final path = Path();
     path.moveTo(position.dx + pathDx + arrowHeadSize, position.dy);

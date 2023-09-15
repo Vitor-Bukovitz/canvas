@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_painter/flutter_painter.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'dart:ui' as ui;
 
@@ -131,6 +132,34 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                 return AppBar(
                   title: child,
                   actions: [
+                    IconButton(
+                      icon: const Icon(
+                        PhosphorIcons.airplane,
+                      ),
+                      onPressed: () async {
+                        final svg = await vg.loadPicture(
+                          const SvgAssetLoader('assets/svgs/ruler.svg'),
+                          context,
+                        );
+
+                        final image = await svg.picture.toImage(
+                          svg.size.width.toInt(),
+                          svg.size.height.toInt(),
+                        );
+                        setState(() {
+                          controller.addDrawables(
+                            [
+                              RulerDrawable(
+                                image: image,
+                                position: const Offset(150, 0),
+                                scale: 0.4,
+                              ),
+                            ],
+                          );
+                        });
+                        svg.picture.dispose();
+                      },
+                    ),
                     // Delete the selected drawable
                     IconButton(
                       icon: const Icon(
@@ -179,8 +208,10 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
               // Enforces constraints
               Positioned.fill(
                 child: Center(
-                  child: AspectRatio(
-                    aspectRatio: 1,
+                  child: SizedBox(
+                    // aspectRatio: 1,
+                    width: 300,
+                    height: 300,
                     child: FlutterPainter(
                       controller: controller,
                     ),

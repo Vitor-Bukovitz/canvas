@@ -56,33 +56,75 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
   void _handleHorizontalDragDown(Offset globalPosition) {
     // If the user is already drawing, don't create a new drawing
     if (this.drawable != null) return;
-
     // Create a new free-style drawable representing the current drawing
     final PathDrawable drawable;
-    if (settings.mode == FreeStyleMode.draw) {
-      // drawable = FreeStyleDrawable(
-      //   path: [_globalToLocal(globalPosition)],
-      //   color: settings.color,
-      //   strokeWidth: settings.strokeWidth,
-      // );
-      drawable = SmoothStyleDrawable(
-        path: [_globalToLocal(globalPosition)],
-        color: settings.color,
-      );
+    switch (settings.mode) {
+      case FreeStyleMode.draw:
+      case FreeStyleMode.drawSmooth:
+        // get ruler drawable if present
+        final ruler = PainterController.of(context)
+                .drawables
+                .firstWhereOrNull((element) => element is RulerDrawable)
+            as RulerDrawable?;
+        if (ruler != null) {
+          // get pointer position
+          final localPosition = _globalToLocal(
+            globalPosition,
+            clipToRuler: false,
+          );
 
-      // Add the drawable to the controller's drawables
-      PainterController.of(context).addDrawables([drawable]);
-    } else if (settings.mode == FreeStyleMode.erase) {
-      drawable = EraseDrawable(
-        path: [_globalToLocal(globalPosition)],
-        strokeWidth: settings.strokeWidth,
-      );
-      PainterController.of(context).groupDrawables();
+          // check if pointer is inside ruler
+          final rulerRect = Rect.fromCenter(
+            center: ruler.position,
+            width: ruler.getSize().width,
+            height: ruler.getSize().height,
+          );
 
-      // Add the drawable to the controller's drawables
-      PainterController.of(context).addDrawables([drawable], newAction: false);
-    } else {
-      return;
+          if (rulerRect.contains(localPosition)) {
+            // switch to move mode
+            PainterController.of(context).freeStyleMode = FreeStyleMode.none;
+            PainterController.of(context).selectObjectDrawable(ruler);
+            return;
+          }
+
+          ruler.setSide(
+            localPosition.rotate(
+              -ruler.rotationAngle,
+              origin: ruler.position,
+            ),
+          );
+        }
+
+        // Create a new free-style drawable representing the current drawing
+        if (settings.mode == FreeStyleMode.draw) {
+          drawable = FreeStyleDrawable(
+            path: [_globalToLocal(globalPosition)],
+            strokeWidth: settings.strokeWidth,
+            color: settings.color,
+          );
+        } else {
+          drawable = SmoothStyleDrawable(
+            path: [_globalToLocal(globalPosition)],
+            color: settings.color,
+          );
+        }
+
+        // Add the drawable to the controller's drawables
+        PainterController.of(context).addDrawables([drawable]);
+        break;
+      case FreeStyleMode.erase:
+        drawable = EraseDrawable(
+          path: [_globalToLocal(globalPosition)],
+          strokeWidth: settings.strokeWidth,
+        );
+        PainterController.of(context).groupDrawables();
+
+        // Add the drawable to the controller's drawables
+        PainterController.of(context)
+            .addDrawables([drawable], newAction: false);
+        break;
+      case FreeStyleMode.none:
+        return;
     }
 
     // Set the drawable as the current drawable
@@ -119,10 +161,46 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
     PainterController.of(context).undo();
   }
 
-  Offset _globalToLocal(Offset globalPosition) {
+  Offset _globalToLocal(
+    Offset globalPosition, {
+    bool clipToRuler = true,
+  }) {
     final getBox = context.findRenderObject() as RenderBox;
 
-    return getBox.globalToLocal(globalPosition);
+    Offset position = getBox.globalToLocal(globalPosition);
+
+    // check ruler position
+    final ruler = PainterController.of(context)
+            .drawables
+            .firstWhereOrNull((element) => element is RulerDrawable)
+        as RulerDrawable?;
+
+    // limit position based on the offsets
+    if (ruler != null && clipToRuler) {
+      final rulerRect = Rect.fromCenter(
+        center: ruler.position,
+        width: ruler.getSize().width,
+        height: ruler.getSize().height,
+      );
+
+      position = position.rotate(-ruler.rotationAngle, origin: ruler.position);
+
+      switch (ruler.side) {
+        case RulerSide.left:
+          if (position.dx > rulerRect.left) {
+            position = Offset(rulerRect.left, position.dy);
+          }
+          break;
+        case RulerSide.right:
+          if (position.dx < rulerRect.right) {
+            position = Offset(rulerRect.right, position.dy);
+          }
+          break;
+      }
+      position = position.rotate(ruler.rotationAngle, origin: ruler.position);
+    }
+
+    return position;
   }
 }
 

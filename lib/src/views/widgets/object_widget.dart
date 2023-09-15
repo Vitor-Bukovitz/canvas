@@ -647,7 +647,9 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   ///
   /// Calculates the next position, scale and rotation of the object depending on the event details.
   void onDrawableScaleUpdate(
-      MapEntry<int, ObjectDrawable> entry, ScaleUpdateDetails details) {
+    MapEntry<int, ObjectDrawable> entry,
+    ScaleUpdateDetails details,
+  ) {
     if (!widget.interactionEnabled) return;
 
     final index = entry.key;
@@ -907,9 +909,12 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
         ));
   }
 
-  void onScaleControlPanUpdate(MapEntry<int, ObjectDrawable> entry,
-      DragUpdateDetails details, BoxConstraints constraints,
-      [bool isReversed = true]) {
+  void onScaleControlPanUpdate(
+    MapEntry<int, ObjectDrawable> entry,
+    DragUpdateDetails details,
+    BoxConstraints constraints, [
+    bool isReversed = true,
+  ]) {
     final index = entry.key;
     final initial = initialScaleDrawables[index];
     if (initial == null) return;
@@ -998,9 +1003,6 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
         vertical ? totalLength : drawable.size.height,
       ),
       position: initial.position + position,
-      // scale: scale,
-      // rotation: assistedRotation,
-      // assists: assists,
     );
 
     updateDrawable(drawable, newDrawable);
@@ -1019,7 +1021,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
     setState(() {
       final _m4storage =
           PainterController.of(context).transformationController.value;
-      transformationScale = math.sqrt(_m4storage[8] * _m4storage[8] +
+      transformationScale = sqrt(_m4storage[8] * _m4storage[8] +
           _m4storage[9] * _m4storage[9] +
           _m4storage[10] * _m4storage[10]);
     });

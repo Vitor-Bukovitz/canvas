@@ -54,8 +54,6 @@ abstract class PathDrawable extends Drawable {
     });
 
     // Draw the path on the canvas
-    canvas.drawPath(path, paint);
-
     final currentDrawable = this;
     for (int i = 1; i < this.path.length; i++) {
       canvas.drawPath(
