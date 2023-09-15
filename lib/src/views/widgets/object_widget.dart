@@ -728,7 +728,7 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
 
     // Snap the object to the horizontal/vertical center if its is near it
     // and layout assist is enabled
-    final assistedPosition = Offset(
+    Offset assistedPosition = Offset(
       assists.contains(ObjectDrawableAssist.vertical) ? center.dx : position.dx,
       assists.contains(ObjectDrawableAssist.horizontal)
           ? center.dy
@@ -742,6 +742,18 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
         ? closestAssistAngle.remainder(pi * 2)
         : rotation;
 
+    if (drawable is RulerDrawable) {
+      Offset currentDrawableOffset = drawable.position.rotate(
+        -assistedRotation,
+      );
+      assistedPosition = Offset(
+        assistedPosition.rotate(-assistedRotation).dx,
+        currentDrawableOffset.dy,
+      ).rotate(
+        assistedRotation,
+      );
+    }
+
     final newDrawable = drawable.copyWith(
       position: assistedPosition,
       scale: scale,
@@ -753,8 +765,12 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   }
 
   /// Calculates whether the object entered or exited the horizontal and vertical assist areas.
-  void calculatePositionalAssists(ObjectLayoutAssistSettings settings,
-      int index, Offset position, Offset center) {
+  void calculatePositionalAssists(
+    ObjectLayoutAssistSettings settings,
+    int index,
+    Offset position,
+    Offset center,
+  ) {
     // Horizontal
     //
     // If the object is within the enter distance from the center dy and isn't marked
@@ -798,7 +814,10 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   ///
   /// Returns the angle the object is closest to if it is inside the assist range.
   double? calculateRotationalAssist(
-      ObjectLayoutAssistSettings settings, int index, double rotation) {
+    ObjectLayoutAssistSettings settings,
+    int index,
+    double rotation,
+  ) {
     // Calculates all angles from [assistAngles] in the exit range of rotational assist
     final closeAngles = assistAngles
         .where(
@@ -870,8 +889,11 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
         ));
   }
 
-  void onRotationControlPanUpdate(MapEntry<int, ObjectDrawable> entry,
-      DragUpdateDetails details, Size size) {
+  void onRotationControlPanUpdate(
+    MapEntry<int, ObjectDrawable> entry,
+    DragUpdateDetails details,
+    Size size,
+  ) {
     final index = entry.key;
     final initial = initialScaleDrawables[index];
     if (initial == null) return;
