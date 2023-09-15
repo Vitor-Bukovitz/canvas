@@ -41,25 +41,13 @@ abstract class PathDrawable extends Drawable {
   /// Draws the free-style [path] on the provided [canvas] of size [size].
   @override
   void draw(Canvas canvas, Size size) {
-    // Create a UI path to draw
-    final path = Path();
-
-    // Start path from the first point
-    path.moveTo(this.path[0].dx, this.path[0].dy);
-    path.lineTo(this.path[0].dx, this.path[0].dy);
-
-    // Draw a line between each point on the free path
-    this.path.sublist(1).forEach((point) {
-      path.lineTo(point.dx, point.dy);
-    });
-
     // Draw the path on the canvas
     final currentDrawable = this;
-    for (int i = 1; i < this.path.length; i++) {
+    for (int i = 1; i < path.length; i++) {
       canvas.drawPath(
         Path()
-          ..moveTo(this.path[i - 1].dx, this.path[i - 1].dy)
-          ..lineTo(this.path[i].dx, this.path[i].dy),
+          ..moveTo(path[i - 1].dx, path[i - 1].dy)
+          ..lineTo(path[i].dx, path[i].dy),
         paint.copyWith(
           strokeWidth: currentDrawable is SmoothStyleDrawable
               ? currentDrawable.strokeWidthList[i]
