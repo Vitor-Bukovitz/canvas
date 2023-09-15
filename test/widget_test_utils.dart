@@ -33,10 +33,10 @@ class WidgetTestbed {
     final WidgetTester tester, [
     final Size size = const Size(30000, 30000),
   ]) {
-    tester.binding.window.physicalSizeTestValue = size;
+    tester.view.physicalSize = size;
   }
 
   void clearPhysicalSize(final WidgetTester tester) {
-    tester.binding.window.clearPhysicalSizeTestValue();
+    tester.view.resetPhysicalSize();
   }
 }

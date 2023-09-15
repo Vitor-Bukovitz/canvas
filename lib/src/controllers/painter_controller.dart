@@ -442,8 +442,13 @@ class PainterControllerValue {
   }
 
   @override
-  int get hashCode => hashValues(
-      hashList(_drawables), background, settings, selectedObjectDrawable);
+  int get hashCode =>
+      Object.hashAll(_drawables) +
+      Object.hashAll([
+        background,
+        settings,
+        selectedObjectDrawable,
+      ]);
 }
 
 /// Private class that is used internally to represent no
