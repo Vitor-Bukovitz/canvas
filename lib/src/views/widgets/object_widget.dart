@@ -868,25 +868,35 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
   }
 
   /// Replaces a drawable with a new one.
-  void updateDrawable(ObjectDrawable oldDrawable, ObjectDrawable newDrawable,
-      {bool newAction = false}) {
+  void updateDrawable(
+    ObjectDrawable oldDrawable,
+    ObjectDrawable newDrawable, {
+    bool newAction = false,
+  }) {
     setState(() {
-      PainterController.of(context)
-          .replaceDrawable(oldDrawable, newDrawable, newAction: newAction);
+      PainterController.of(context).replaceDrawable(
+        oldDrawable,
+        newDrawable,
+        newAction: newDrawable is RulerDrawable ? false : newAction,
+      );
     });
   }
 
-  void onRotationControlPanStart(int controlIndex,
-      MapEntry<int, ObjectDrawable> entry, DragStartDetails details) {
+  void onRotationControlPanStart(
+    int controlIndex,
+    MapEntry<int, ObjectDrawable> entry,
+    DragStartDetails details,
+  ) {
     setState(() {
       controlsAreActive[controlIndex] = true;
     });
     onDrawableScaleStart(
-        entry,
-        ScaleStartDetails(
-          pointerCount: 2,
-          localFocalPoint: entry.value.position,
-        ));
+      entry,
+      ScaleStartDetails(
+        pointerCount: 2,
+        localFocalPoint: entry.value.position,
+      ),
+    );
   }
 
   void onRotationControlPanUpdate(
@@ -912,16 +922,22 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
         ));
   }
 
-  void onRotationControlPanEnd(int controlIndex,
-      MapEntry<int, ObjectDrawable> entry, DragEndDetails details) {
+  void onRotationControlPanEnd(
+    int controlIndex,
+    MapEntry<int, ObjectDrawable> entry,
+    DragEndDetails details,
+  ) {
     setState(() {
       controlsAreActive[controlIndex] = false;
     });
     onDrawableScaleEnd(entry);
   }
 
-  void onScaleControlPanStart(int controlIndex,
-      MapEntry<int, ObjectDrawable> entry, DragStartDetails details) {
+  void onScaleControlPanStart(
+    int controlIndex,
+    MapEntry<int, ObjectDrawable> entry,
+    DragStartDetails details,
+  ) {
     setState(() {
       controlsAreActive[controlIndex] = true;
     });
@@ -949,25 +965,32 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
         ? (length * 2)
         : ((length + initialLength) / initialLength);
     onDrawableScaleUpdate(
-        entry,
-        ScaleUpdateDetails(
-          pointerCount: 1,
-          rotation: 0,
-          scale: scale.clamp(ObjectDrawable.minScale, double.infinity),
-          localFocalPoint: entry.value.position,
-        ));
+      entry,
+      ScaleUpdateDetails(
+        pointerCount: 1,
+        rotation: 0,
+        scale: scale.clamp(ObjectDrawable.minScale, double.infinity),
+        localFocalPoint: entry.value.position,
+      ),
+    );
   }
 
-  void onScaleControlPanEnd(int controlIndex,
-      MapEntry<int, ObjectDrawable> entry, DragEndDetails details) {
+  void onScaleControlPanEnd(
+    int controlIndex,
+    MapEntry<int, ObjectDrawable> entry,
+    DragEndDetails details,
+  ) {
     setState(() {
       controlsAreActive[controlIndex] = false;
     });
     onDrawableScaleEnd(entry);
   }
 
-  void onResizeControlPanStart(int controlIndex,
-      MapEntry<int, ObjectDrawable> entry, DragStartDetails details) {
+  void onResizeControlPanStart(
+    int controlIndex,
+    MapEntry<int, ObjectDrawable> entry,
+    DragStartDetails details,
+  ) {
     setState(() {
       controlsAreActive[controlIndex] = true;
     });
@@ -979,9 +1002,13 @@ class _ObjectWidgetState extends State<_ObjectWidget> {
         ));
   }
 
-  void onResizeControlPanUpdate(MapEntry<int, ObjectDrawable> entry,
-      DragUpdateDetails details, BoxConstraints constraints, Axis axis,
-      [bool isReversed = true]) {
+  void onResizeControlPanUpdate(
+    MapEntry<int, ObjectDrawable> entry,
+    DragUpdateDetails details,
+    BoxConstraints constraints,
+    Axis axis, [
+    bool isReversed = true,
+  ]) {
     final index = entry.key;
 
     final drawable = entry.value;

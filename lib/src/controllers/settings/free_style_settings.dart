@@ -21,8 +21,11 @@ class FreeStyleSettings {
   });
 
   /// Creates a copy of this but with the given fields replaced with the new values.
-  FreeStyleSettings copyWith(
-      {FreeStyleMode? mode, Color? color, double? strokeWidth}) {
+  FreeStyleSettings copyWith({
+    FreeStyleMode? mode,
+    Color? color,
+    double? strokeWidth,
+  }) {
     return FreeStyleSettings(
       mode: mode ?? this.mode,
       color: color ?? this.color,
@@ -41,6 +44,12 @@ enum FreeStyleMode {
 
   /// Free-style painting is enabled in drawing mode; used to draw smooth lines.
   drawSmooth,
+
+  /// Free-style painting is enabled in marker mode; used to draw marker lines.
+  spray,
+
+  // Chalk
+  chalk,
 
   /// Free-style painting is enabled in erasing mode; used to erase drawings.
   erase,

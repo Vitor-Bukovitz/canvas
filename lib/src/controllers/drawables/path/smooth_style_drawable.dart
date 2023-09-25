@@ -54,19 +54,6 @@ class SmoothStyleDrawable extends PathDrawable {
     ..color = color
     ..strokeWidth = strokeWidth;
 
-  /// Compares two [SmoothStyleDrawable]s for equality.
-  // @override
-  // bool operator ==(Object other) {
-  //   return other is SmoothStyleDrawable &&
-  //       super == other &&
-  //       other.color == color &&
-  //       other.strokeWidth == strokeWidth &&
-  //       ListEquality().equals(other.path, path);
-  // }
-  //
-  // @override
-  // int get hashCode => hashValues(hidden, hashList(path), color, strokeWidth);
-
   List<double> _generateStrokeWidthList() {
     final List<double> strokeWidthList = [strokeWidth];
     for (int i = 1; i < path.length; i++) {

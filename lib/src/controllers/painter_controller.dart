@@ -4,17 +4,13 @@ import 'dart:ui' as ui;
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_painter/flutter_painter.dart';
+import 'package:flutter_svg/svg.dart';
 import 'events/selected_object_drawable_removed_event.dart';
 import '../views/widgets/painter_controller_widget.dart';
 import 'actions/actions.dart';
-import 'drawables/image_drawable.dart';
 import 'events/events.dart';
-import 'drawables/background/background_drawable.dart';
-import 'drawables/object_drawable.dart';
-import 'settings/settings.dart';
 import '../views/painters/painter.dart';
-
-import 'drawables/drawable.dart';
 
 /// Controller used to control a [FlutterPainter] widget.
 ///
@@ -114,6 +110,47 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
     }
   }
 
+  Future<void> toggleRuler() async {
+    final rulerDrawable = drawables.firstWhereOrNull(
+      (drawable) => drawable is RulerDrawable,
+    );
+    if (rulerDrawable == null) {
+      final svg = await vg.loadPicture(
+        const SvgAssetLoader(
+          'assets/ruler.svg',
+          packageName: 'flutter_painter',
+        ),
+        null,
+      );
+
+      final renderBox =
+          painterKey.currentContext?.findRenderObject() as RenderBox?;
+      Size size = renderBox?.size ?? Size.zero;
+      final height = size.height * 4;
+      final width = height * svg.size.aspectRatio - 10;
+      final image = await svg.picture.toImage(
+        width.toInt(),
+        height.toInt(),
+      );
+      final center = renderBox == null
+          ? Offset.zero
+          : Offset(
+              renderBox.size.width / 2,
+              renderBox.size.height / 2 + 50,
+            );
+      addDrawables(
+        [RulerDrawable(image: image, position: center)],
+        newAction: false,
+      );
+      svg.picture.dispose();
+    } else {
+      removeDrawable(
+        rulerDrawable,
+        newAction: false,
+      );
+    }
+  }
+
   /// Inserts the [drawables] to the controller value drawables at the provided [index].
   ///
   /// If [newAction] is `true`, the action is added as an independent action
@@ -149,8 +186,11 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// actions, not during the build, layout, or paint phases.
   ///
   /// [notifyListeners] will not be called if the return value is `false`.
-  bool replaceDrawable(Drawable oldDrawable, Drawable newDrawable,
-      {bool newAction = true}) {
+  bool replaceDrawable(
+    Drawable oldDrawable,
+    Drawable newDrawable, {
+    bool newAction = true,
+  }) {
     final action = ReplaceDrawableAction(oldDrawable, newDrawable);
     final value = action.perform(this);
     if (value) _addAction(action, newAction);
@@ -171,7 +211,10 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// actions, not during the build, layout, or paint phases.
   ///
   /// [notifyListeners] will not be called if the return value is `false`.
-  bool removeDrawable(Drawable drawable, {bool newAction = true}) {
+  bool removeDrawable(
+    Drawable drawable, {
+    bool newAction = true,
+  }) {
     final action = RemoveDrawableAction(drawable);
     final value = action.perform(this);
     _addAction(action, newAction);
@@ -190,7 +233,9 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// actions, not during the build, layout, or paint phases.
   ///
   /// [notifyListeners] will not be called if there are no drawables in the controller value.
-  void removeLastDrawable({bool newAction = true}) {
+  void removeLastDrawable({
+    bool newAction = true,
+  }) {
     removeDrawable(value.drawables.last);
   }
 
@@ -204,7 +249,9 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  void clearDrawables({bool newAction = true}) {
+  void clearDrawables({
+    bool newAction = true,
+  }) {
     final action = ClearDrawablesAction();
     action.perform(this);
     _addAction(action, newAction);
@@ -218,7 +265,9 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  void groupDrawables({bool newAction = true}) {
+  void groupDrawables({
+    bool newAction = true,
+  }) {
     final action = MergeDrawablesAction();
     action.perform(this);
     _addAction(action, newAction);
@@ -297,7 +346,10 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   ///   });
   /// }
   /// ```
-  void addImage(ui.Image image, [Size? size]) {
+  void addImage(
+    ui.Image image, [
+    Size? size,
+  ]) {
     // Calculate the center of the painter
     final renderBox =
         painterKey.currentContext?.findRenderObject() as RenderBox?;
@@ -314,7 +366,10 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
       drawable = ImageDrawable(image: image, position: center);
     } else {
       drawable = ImageDrawable.fittedToSize(
-          image: image, position: center, size: size);
+        image: image,
+        position: center,
+        size: size,
+      );
     }
 
     addDrawables([drawable]);
@@ -324,7 +379,9 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   ///
   /// The size of the output image is controlled by [size].
   /// All drawables will be scaled according to that image size.
-  Future<ui.Image> renderImage(Size size) async {
+  Future<ui.Image> renderImage(
+    Size size,
+  ) async {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
     final painter = Painter(
@@ -350,7 +407,9 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  void selectObjectDrawable(ObjectDrawable? drawable) {
+  void selectObjectDrawable(
+    ObjectDrawable? drawable,
+  ) {
     if (drawable == value.selectedObjectDrawable) return;
     if (drawable != null && !value.drawables.contains(drawable)) return;
     value = value.copyWith(
@@ -371,7 +430,9 @@ class PainterController extends ValueNotifier<PainterControllerValue> {
   /// that they need to update (it calls [notifyListeners]). For this reason,
   /// this method should only be called between frames, e.g. in response to user
   /// actions, not during the build, layout, or paint phases.
-  void deselectObjectDrawable({bool isRemoved = false}) {
+  void deselectObjectDrawable({
+    bool isRemoved = false,
+  }) {
     if (selectedObjectDrawable != null && isRemoved) {
       _eventsSteamController.add(const SelectedObjectDrawableRemovedEvent());
     }

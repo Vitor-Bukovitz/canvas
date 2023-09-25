@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_painter/flutter_painter.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'dart:ui' as ui;
 
@@ -41,7 +40,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
   ui.Image? backgroundImage;
   Paint shapePaint = Paint()
     ..strokeWidth = 5
-    ..color = Colors.red
+    ..color = Colors.black
     ..style = PaintingStyle.stroke
     ..strokeCap = StrokeCap.round;
 
@@ -97,7 +96,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
               maxScale: 5,
             )));
     // Listen to focus events of the text field
-    // textFocusNode.addListener(onFocus);
+    textFocusNode.addListener(onFocus);
     // Initialize background
     initBackground();
   }
@@ -134,30 +133,12 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
                   actions: [
                     IconButton(
                       icon: const Icon(
-                        PhosphorIcons.airplane,
+                        PhosphorIcons.ruler,
                       ),
-                      onPressed: () async {
-                        final svg = await vg.loadPicture(
-                          const SvgAssetLoader('assets/svgs/ruler.svg'),
-                          context,
-                        );
-
-                        final image = await svg.picture.toImage(
-                          svg.size.width.toInt(),
-                          svg.size.height.toInt(),
-                        );
+                      onPressed: () {
                         setState(() {
-                          controller.addDrawables(
-                            [
-                              RulerDrawable(
-                                image: image,
-                                position: const Offset(150, 0),
-                                scale: 0.4,
-                              ),
-                            ],
-                          );
+                          controller.toggleRuler();
                         });
-                        svg.picture.dispose();
                       },
                     ),
                     // Delete the selected drawable
@@ -205,13 +186,12 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
         body: Stack(
           children: [
             if (backgroundImage != null)
+
               // Enforces constraints
               Positioned.fill(
                 child: Center(
-                  child: SizedBox(
-                    // aspectRatio: 1,
-                    width: 300,
-                    height: 300,
+                  child: AspectRatio(
+                    aspectRatio: 1,
                     child: FlutterPainter(
                       controller: controller,
                     ),
@@ -532,7 +512,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
 
   void toggleFreeStyleDraw() {
     controller.freeStyleMode = controller.freeStyleMode != FreeStyleMode.draw
-        ? FreeStyleMode.draw
+        ? FreeStyleMode.chalk
         : FreeStyleMode.none;
   }
 

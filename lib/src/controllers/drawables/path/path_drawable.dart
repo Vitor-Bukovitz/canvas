@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_painter/flutter_painter_extensions.dart';
-import 'package:flutter_painter/src/controllers/drawables/path/smooth_style_drawable.dart';
 
 import '../drawable.dart';
+import 'path_drawables.dart';
 
 /// Free-style Drawable (hand scribble).
 abstract class PathDrawable extends Drawable {

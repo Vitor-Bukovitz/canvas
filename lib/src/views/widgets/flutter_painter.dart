@@ -5,8 +5,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_painter/flutter_painter.dart';
-import 'package:flutter_painter/src/controllers/drawables/path/smooth_style_drawable.dart';
 import 'package:flutter_painter/src/extensions/offset_extension.dart';
+import 'package:flutter_svg/svg.dart';
 import '../../controllers/events/selected_object_drawable_removed_event.dart';
 import '../../controllers/notifications/notifications.dart';
 import '../../controllers/drawables/sized1ddrawable.dart';
@@ -168,6 +168,7 @@ class _FlutterPainterWidget extends StatelessWidget {
                     interactionEnabled: true,
                     child: CustomPaint(
                       painter: Painter(
+                        key: controller.painterKey,
                         drawables: controller.value.drawables,
                         background: controller.value.background,
                       ),

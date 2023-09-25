@@ -6,7 +6,7 @@ repository: https://github.com/omarhurani/flutter_painter
 issue_tracker: https://github.com/omarhurani/flutter_painter/issues
 
 environment:
-  sdk: ">=2.14.0 <3.0.0"
+  sdk: ">=3.0.0 <=3.1.2"
   flutter: ">=1.17.0"
 
 dependencies:
@@ -14,6 +14,7 @@ dependencies:
     sdk: flutter
 
   collection: ^1.17.2
+  flutter_svg: ^2.0.7
 
 dev_dependencies:
   flutter_lints: ^1.0.4
@@ -22,3 +23,5 @@ dev_dependencies:
   mocktail: ^0.3.0-dev.1
 
 flutter:
+  assets:
+    - assets/

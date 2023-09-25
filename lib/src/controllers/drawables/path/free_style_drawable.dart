@@ -48,17 +48,4 @@ class FreeStyleDrawable extends PathDrawable {
     ..strokeJoin = StrokeJoin.round
     ..color = color
     ..strokeWidth = strokeWidth;
-
-  /// Compares two [FreeStyleDrawable]s for equality.
-  // @override
-  // bool operator ==(Object other) {
-  //   return other is FreeStyleDrawable &&
-  //       super == other &&
-  //       other.color == color &&
-  //       other.strokeWidth == strokeWidth &&
-  //       ListEquality().equals(other.path, path);
-  // }
-  //
-  // @override
-  // int get hashCode => hashValues(hidden, hashList(path), color, strokeWidth);
 }

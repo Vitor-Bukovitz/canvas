@@ -53,13 +53,15 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
       PainterController.of(context).value.settings.shape;
 
   /// Callback when the user holds their pointer(s) down onto the widget.
-  void _handleHorizontalDragDown(Offset globalPosition) {
+  void _handleHorizontalDragDown(Offset globalPosition) async {
     // If the user is already drawing, don't create a new drawing
     if (this.drawable != null) return;
     // Create a new free-style drawable representing the current drawing
     final PathDrawable drawable;
     switch (settings.mode) {
       case FreeStyleMode.draw:
+      case FreeStyleMode.chalk:
+      case FreeStyleMode.spray:
       case FreeStyleMode.drawSmooth:
         // get ruler drawable if present
         final ruler = PainterController.of(context)
@@ -96,17 +98,45 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
         }
 
         // Create a new free-style drawable representing the current drawing
-        if (settings.mode == FreeStyleMode.draw) {
-          drawable = FreeStyleDrawable(
-            path: [_globalToLocal(globalPosition)],
-            strokeWidth: settings.strokeWidth,
-            color: settings.color,
-          );
-        } else {
-          drawable = SmoothStyleDrawable(
-            path: [_globalToLocal(globalPosition)],
-            color: settings.color,
-          );
+        switch (settings.mode) {
+          case FreeStyleMode.draw:
+            drawable = FreeStyleDrawable(
+              path: [_globalToLocal(globalPosition)],
+              strokeWidth: settings.strokeWidth,
+              color: settings.color,
+            );
+          case FreeStyleMode.drawSmooth:
+            drawable = SmoothStyleDrawable(
+              path: [_globalToLocal(globalPosition)],
+              color: settings.color,
+            );
+          case FreeStyleMode.spray:
+            final svg = await vg.loadPicture(
+              const SvgAssetLoader(
+                'assets/spray.svg',
+                packageName: 'flutter_painter',
+              ),
+              context,
+            );
+            final image = await svg.picture.toImage(
+              svg.size.width.toInt(),
+              svg.size.height.toInt(),
+            );
+            drawable = SprayStyleDrawable(
+              image: image,
+              path: [_globalToLocal(globalPosition)],
+              strokeWidth: settings.strokeWidth,
+              color: settings.color,
+            );
+          case FreeStyleMode.chalk:
+            drawable = ChalkStyleDrawable(
+              path: [_globalToLocal(globalPosition)],
+              strokeWidth: settings.strokeWidth,
+              color: settings.color,
+            );
+          case FreeStyleMode.none:
+          case FreeStyleMode.erase:
+            throw UnimplementedError();
         }
 
         // Add the drawable to the controller's drawables
