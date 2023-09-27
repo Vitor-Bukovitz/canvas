@@ -168,7 +168,6 @@ class _FlutterPainterWidget extends StatelessWidget {
                     interactionEnabled: true,
                     child: CustomPaint(
                       painter: Painter(
-                        key: controller.painterKey,
                         drawables: controller.value.drawables,
                         background: controller.value.background,
                       ),

@@ -544,13 +544,14 @@ class _NoObjectPassedBackgroundDrawable extends ObjectDrawable {
         );
 
   @override
-  ObjectDrawable copyWith(
-      {bool? hidden,
-      Set<ObjectDrawableAssist>? assists,
-      ui.Offset? position,
-      double? rotation,
-      double? scale,
-      bool? locked}) {
+  ObjectDrawable copyWith({
+    bool? hidden,
+    Set<ObjectDrawableAssist>? assists,
+    ui.Offset? position,
+    double? rotation,
+    double? scale,
+    bool? locked,
+  }) {
     throw UnimplementedError(
         "This object drawable is only to hold the default value in the PainterControllerValue copyWith method, and must not be used otherwise.");
   }
