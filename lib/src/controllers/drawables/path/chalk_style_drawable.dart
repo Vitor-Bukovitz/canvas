@@ -59,8 +59,7 @@ class ChalkStyleDrawable extends PathDrawable {
     ..style = PaintingStyle.stroke
     ..strokeCap = StrokeCap.round
     ..strokeJoin = StrokeJoin.round
-    ..color = Colors.black
-    ..strokeWidth = strokeWidth;
+    ..color = Colors.black;
 
   @override
   void draw(Canvas canvas, Size size) {
@@ -108,14 +107,15 @@ class ChalkStyleDrawable extends PathDrawable {
       if (rectMap[pathStart] == null) {
         // Chalk effect
         final length = pathEnd - pathStart;
-        final xUnit = length.dx / length.distance;
-        final yUnit = length.dy / length.distance;
+        final xUnit = (length.dx / length.distance);
+        final yUnit = (length.dy / length.distance);
 
         List<Rect> clipList = [];
         for (int j = 0; j < length.distance; j++) {
           final random = Random();
           final xCurrent = pathStart.dx + (j * xUnit);
           final yCurrent = pathStart.dy + (j * yUnit);
+          // from 2 to 25
           final xRandom = xCurrent + (random.nextDouble() - 0.5) * 5.0 * 1.2;
           final yRandom = yCurrent + (random.nextDouble() - 0.5) * 5.0 * 1.2;
           final rect = Rect.fromPoints(
