@@ -35,7 +35,6 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
             onHorizontalDragDown: _handleHorizontalDragDown,
             onHorizontalDragUpdate: _handleHorizontalDragUpdate,
             onHorizontalDragUp: _handleHorizontalDragUp,
-            onScaling: _handleScaling,
           ),
           (_) {},
         ),
@@ -62,6 +61,7 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
       case FreeStyleMode.draw:
       case FreeStyleMode.chalk:
       case FreeStyleMode.spray:
+      case FreeStyleMode.marker:
       case FreeStyleMode.drawSmooth:
         // get ruler drawable if present
         final ruler = PainterController.of(context)
@@ -74,20 +74,6 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
             globalPosition,
             clipToRuler: false,
           );
-
-          // check if pointer is inside ruler
-          final rulerRect = Rect.fromCenter(
-            center: ruler.position,
-            width: ruler.getSize().width,
-            height: ruler.getSize().height,
-          );
-
-          if (rulerRect.contains(localPosition)) {
-            // switch to move mode
-            PainterController.of(context).freeStyleMode = FreeStyleMode.none;
-            PainterController.of(context).selectObjectDrawable(ruler);
-            return;
-          }
 
           ruler.setSide(
             localPosition.rotate(
@@ -111,25 +97,19 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
               color: settings.color,
             );
           case FreeStyleMode.spray:
-            final svg = await vg.loadPicture(
-              const SvgAssetLoader(
-                'assets/spray.svg',
-                packageName: 'flutter_painter',
-              ),
-              context,
-            );
-            final image = await svg.picture.toImage(
-              svg.size.width.toInt(),
-              svg.size.height.toInt(),
-            );
             drawable = SprayStyleDrawable(
-              image: image,
               path: [_globalToLocal(globalPosition)],
               strokeWidth: settings.strokeWidth,
               color: settings.color,
             );
           case FreeStyleMode.chalk:
             drawable = ChalkStyleDrawable(
+              path: [_globalToLocal(globalPosition)],
+              strokeWidth: settings.strokeWidth,
+              color: settings.color,
+            );
+          case FreeStyleMode.marker:
+            drawable = MarkerStyleDrawable(
               path: [_globalToLocal(globalPosition)],
               strokeWidth: settings.strokeWidth,
               color: settings.color,
@@ -187,10 +167,6 @@ class _FreeStyleWidgetState extends State<_FreeStyleWidget> {
     drawable = null;
   }
 
-  void _handleScaling() {
-    PainterController.of(context).undo();
-  }
-
   Offset _globalToLocal(
     Offset globalPosition, {
     bool clipToRuler = true,
@@ -240,13 +216,11 @@ class _DragGestureDetector extends OneSequenceGestureRecognizer {
     required this.onHorizontalDragDown,
     required this.onHorizontalDragUpdate,
     required this.onHorizontalDragUp,
-    required this.onScaling,
   });
 
   final ValueSetter<Offset> onHorizontalDragDown;
   final ValueSetter<Offset> onHorizontalDragUpdate;
   final VoidCallback onHorizontalDragUp;
-  final VoidCallback onScaling;
 
   bool _isTrackingGesture = false;
   bool _isZooming = false;
@@ -259,7 +233,6 @@ class _DragGestureDetector extends OneSequenceGestureRecognizer {
       _isTrackingGesture = true;
       _isZooming = false;
     } else {
-      onScaling();
       stopTrackingPointer(event.pointer);
       _isZooming = true;
       _isTrackingGesture = false;

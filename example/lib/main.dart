@@ -77,41 +77,31 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
   void initState() {
     super.initState();
     controller = PainterController(
-        settings: PainterSettings(
-            text: TextSettings(
-              focusNode: textFocusNode,
-              textStyle: const TextStyle(
-                  fontWeight: FontWeight.bold, color: red, fontSize: 18),
-            ),
-            freeStyle: const FreeStyleSettings(
-              color: red,
-              strokeWidth: 5,
-            ),
-            shape: ShapeSettings(
-              paint: shapePaint,
-            ),
-            scale: const ScaleSettings(
-              enabled: true,
-              minScale: 1,
-              maxScale: 5,
-            )));
+      settings: PainterSettings(
+        text: TextSettings(
+          focusNode: textFocusNode,
+          textStyle: const TextStyle(
+              fontWeight: FontWeight.bold, color: red, fontSize: 18),
+        ),
+        freeStyle: const FreeStyleSettings(
+          color: red,
+          strokeWidth: 5,
+        ),
+        shape: ShapeSettings(
+          paint: shapePaint,
+        ),
+        scale: const ScaleSettings(
+          enabled: true,
+          minScale: 1,
+          maxScale: 5,
+        ),
+      ),
+      background: const ColorBackgroundDrawable(
+        color: Colors.white,
+      ),
+    );
     // Listen to focus events of the text field
     textFocusNode.addListener(onFocus);
-    // Initialize background
-    initBackground();
-  }
-
-  /// Fetches image from an [ImageProvider] (in this example, [NetworkImage])
-  /// to use it as a background
-  void initBackground() async {
-    // Extension getter (.image) to get [ui.Image] from [ImageProvider]
-    final image =
-        await const NetworkImage('https://picsum.photos/1920/1080/').image;
-
-    setState(() {
-      backgroundImage = image;
-      controller.background = image.backgroundDrawable;
-    });
   }
 
   /// Updates UI when the focus changes
@@ -126,7 +116,7 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
           // Listen to the controller and update the UI when it updates.
           child: ValueListenableBuilder<PainterControllerValue>(
               valueListenable: controller,
-              child: const Text("Flutter Painter Example"),
+              child: const Text("Painter"),
               builder: (context, _, child) {
                 return AppBar(
                   title: child,
@@ -185,19 +175,16 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
         ),
         body: Stack(
           children: [
-            if (backgroundImage != null)
-
-              // Enforces constraints
-              Positioned.fill(
-                child: Center(
-                  child: AspectRatio(
-                    aspectRatio: 1,
-                    child: FlutterPainter(
-                      controller: controller,
-                    ),
+            Positioned.fill(
+              child: Center(
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: FlutterPainter(
+                    controller: controller,
                   ),
                 ),
               ),
+            ),
             Positioned(
               bottom: 0,
               right: 0,
@@ -511,8 +498,8 @@ class _FlutterPainterExampleState extends State<FlutterPainterExample> {
   }
 
   void toggleFreeStyleDraw() {
-    controller.freeStyleMode = controller.freeStyleMode != FreeStyleMode.draw
-        ? FreeStyleMode.chalk
+    controller.freeStyleMode = controller.freeStyleMode != FreeStyleMode.marker
+        ? FreeStyleMode.marker
         : FreeStyleMode.none;
   }
 

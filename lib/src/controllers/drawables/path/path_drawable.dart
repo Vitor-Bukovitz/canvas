@@ -1,42 +1,74 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_painter/flutter_painter_extensions.dart';
+import 'dart:ui' as ui;
 
-import '../drawable.dart';
-import 'path_drawables.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_painter/flutter_painter.dart';
 
 /// Free-style Drawable (hand scribble).
 abstract class PathDrawable extends Drawable {
   /// List of points representing the path to draw.
-  final List<Offset> path;
+  final List<Offset> _path;
 
   /// The stroke width the path will be drawn with.
   final double strokeWidth;
+
+  /// The previous image to be drawn on.
+  ui.Image? previousImage;
+  int lastDrawnPathIndex;
 
   /// Creates a [PathDrawable] to draw [path].
   ///
   /// The path will be drawn with the passed [strokeWidth] if provided.
   PathDrawable({
-    required this.path,
+    required List<Offset> path,
+    this.previousImage,
+    this.lastDrawnPathIndex = 0,
+    super.hidden = false,
     this.strokeWidth = 1,
-    bool hidden = false,
-  })  :
-        // An empty path cannot be drawn, so it is an invalid argument.
-        assert(path.isNotEmpty, 'The path cannot be an empty list'),
-
-        // The line cannot have a non-positive stroke width.
-        assert(strokeWidth > 0,
-            'The stroke width cannot be less than or equal to 0'),
-        super(hidden: hidden);
+  }) : _path = path;
 
   /// Creates a copy of this but with the given fields replaced with the new values.
   PathDrawable copyWith({
     bool? hidden,
     List<Offset>? path,
+    ui.Image? previousImage,
+    int? lastDrawnPathIndex,
     double? strokeWidth,
   });
 
   @protected
   Paint get paint;
+
+  List<Offset> get path =>
+      (lastDrawnPathIndex > 0 && _path.length > lastDrawnPathIndex)
+          ? _path.sublist(lastDrawnPathIndex)
+          : _path;
+
+  (Canvas, ui.PictureRecorder) startDrawing(Canvas canvas, Size size) {
+    final image = previousImage;
+    final recorder = ui.PictureRecorder();
+    final recordCanvas = Canvas(recorder, Offset.zero & size);
+    if (image != null) {
+      recordCanvas.drawImage(image, Offset.zero, Paint());
+    }
+    return (recordCanvas, recorder);
+  }
+
+  void endDrawing(Canvas canvas, Size size, ui.PictureRecorder recorder) {
+    final image = previousImage;
+    if (path.length > 1) {
+      final picture = recorder.endRecording();
+      final pathsImage =
+          picture.toImageSync(size.width.toInt(), size.height.toInt());
+      previousImage = pathsImage;
+      canvas.drawImage(pathsImage, Offset.zero, Paint());
+    } else {
+      if (image != null) {
+        canvas.drawImage(image, Offset.zero, Paint());
+      }
+    }
+    lastDrawnPathIndex = _path.length - 1;
+    print(lastDrawnPathIndex);
+  }
 
   /// Draws the free-style [path] on the provided [canvas] of size [size].
   @override

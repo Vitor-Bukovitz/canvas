@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui' as ui;
 
 import 'path_drawable.dart';
 
@@ -14,18 +15,13 @@ class SmoothStyleDrawable extends PathDrawable {
   ///
   /// The path will be drawn with the passed [color] and [strokeWidth] if provided.
   SmoothStyleDrawable({
-    required List<Offset> path,
-    double strokeWidth = 1,
+    required super.path,
+    super.strokeWidth = 1,
+    super.hidden = false,
+    super.lastDrawnPathIndex = 0,
+    super.previousImage,
     this.color = Colors.black,
-    bool hidden = false,
-  })  :
-        // An empty path cannot be drawn, so it is an invalid argument.
-        assert(path.isNotEmpty, 'The path cannot be an empty list'),
-
-        // The line cannot have a non-positive stroke width.
-        assert(strokeWidth > 0,
-            'The stroke width cannot be less than or equal to 0'),
-        super(path: path, strokeWidth: strokeWidth, hidden: hidden) {
+  }) {
     strokeWidthList = _generateStrokeWidthList();
   }
 
@@ -34,12 +30,16 @@ class SmoothStyleDrawable extends PathDrawable {
   SmoothStyleDrawable copyWith({
     bool? hidden,
     List<Offset>? path,
+    int? lastDrawnPathIndex,
+    ui.Image? previousImage,
     Color? color,
     double? strokeWidth,
   }) {
     return SmoothStyleDrawable(
       path: path ?? this.path,
       color: color ?? this.color,
+      previousImage: previousImage ?? this.previousImage,
+      lastDrawnPathIndex: lastDrawnPathIndex ?? this.lastDrawnPathIndex,
       strokeWidth: strokeWidth ?? this.strokeWidth,
       hidden: hidden ?? this.hidden,
     );

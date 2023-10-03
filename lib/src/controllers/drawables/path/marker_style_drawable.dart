@@ -1,51 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_painter/src/controllers/drawables/path/path_drawable.dart';
+import 'package:flutter_painter/src/controllers/drawables/path/path_image_drawable.dart';
 import 'dart:ui' as ui;
 
-import 'path_drawable.dart';
-
 /// Free-style Drawable (hand scribble).
-class FreeStyleDrawable extends PathDrawable {
-  /// The color the path will be drawn with.
-  final Color color;
-
-  /// Creates a [FreeStyleDrawable] to draw [path].
+class MarkerStyleDrawable extends PathImageDrawable {
+  /// Creates a [MarkerStyleDrawable] to draw [path].
   ///
   /// The path will be drawn with the passed [color] and [strokeWidth] if provided.
-  FreeStyleDrawable({
+  MarkerStyleDrawable({
     required super.path,
+    List<double>? rotations,
+    super.image,
     super.strokeWidth = 1,
     super.hidden = false,
+    super.color,
     super.lastDrawnPathIndex = 0,
     super.previousImage,
-    this.color = Colors.black,
-  });
+  }) : super(
+          imagePath: PathImage.marker,
+          rotations: [
+            ...?rotations,
+            0,
+          ],
+        );
 
-  /// Creates a copy of this but with the given fields replaced with the new values.
   @override
-  FreeStyleDrawable copyWith({
+  PathDrawable copyWith({
+    ui.Image? image,
     bool? hidden,
     List<Offset>? path,
     ui.Image? previousImage,
     int? lastDrawnPathIndex,
     Color? color,
+    List<double>? rotations,
     double? strokeWidth,
   }) {
-    return FreeStyleDrawable(
+    return MarkerStyleDrawable(
+      image: image ?? this.image,
       path: path ?? this.path,
       color: color ?? this.color,
       previousImage: previousImage ?? this.previousImage,
       lastDrawnPathIndex: lastDrawnPathIndex ?? this.lastDrawnPathIndex,
       strokeWidth: strokeWidth ?? this.strokeWidth,
+      rotations: rotations ?? this.rotations,
       hidden: hidden ?? this.hidden,
     );
   }
 
   @protected
   @override
-  Paint get paint => Paint()
-    ..style = PaintingStyle.stroke
-    ..strokeCap = StrokeCap.round
-    ..strokeJoin = StrokeJoin.round
-    ..color = color
-    ..strokeWidth = strokeWidth;
+  Paint get paint => Paint()..color = color;
 }

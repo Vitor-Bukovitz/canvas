@@ -51,6 +51,9 @@ enum FreeStyleMode {
   // Chalk
   chalk,
 
+  // Marker
+  marker,
+
   /// Free-style painting is enabled in erasing mode; used to erase drawings.
   erase,
 }
